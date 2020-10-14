@@ -93,7 +93,7 @@ def warn(user: User, chat: Chat, reason: str, message: Message, warner: User = N
 
 
 @run_async
-@user_admin_no_reply
+#@user_admin_no_reply
 @bot_admin
 @loggable
 def button(bot: Bot, update: Update) -> str:
@@ -115,35 +115,15 @@ def button(bot: Bot, update: Update) -> str:
             return "<b>{}:</b>" \
                    "\n#UNWARN" \
                    "\n<b>Admin:</b> {}" \
-                   "\n<b>User:</b> {}".format(html.escape(chat.title),
-                                              mention_html(user.id, user.first_name),
-                                              mention_html(user_member.user.id, user_member.user.first_name))
+                   "\n<b>User:</b> {} (<code>{}</code>)".format(html.escape(chat.title),
+                                                                mention_html(user.id, user.first_name),
+                                                                mention_html(user_member.user.id, user_member.user.first_name),
+                                                                user_member.user.id)
         else:
             update.effective_message.edit_text(
-                "User has already has no warns.".format(mention_html(user.id, user.first_name)),
+                "ഇയാൾക്ക് നിലവിൽ warns ഒന്നുമില്ല.".format(mention_html(user.id, user.first_name)),
                 parse_mode=ParseMode.HTML)
 
-    return ""
-
-
-@run_async
-@user_admin
-@can_restrict
-@loggable
-def warn_user(bot: Bot, update: Update, args: List[str]) -> str:
-    message = update.effective_message  # type: Optional[Message]
-    chat = update.effective_chat  # type: Optional[Chat]
-    warner = update.effective_user  # type: Optional[User]
-
-    user_id, reason = extract_user_and_text(message, args)
-
-    if user_id:
-        if message.reply_to_message and message.reply_to_message.from_user.id == user_id:
-            return warn(message.reply_to_message.from_user, chat, reason, message.reply_to_message, warner)
-        else:
-            return warn(chat.get_member(user_id).user, chat, reason, message, warner)
-    else:
-        message.reply_text("No user was designated!")
     return ""
 
 
